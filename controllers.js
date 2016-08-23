@@ -98,22 +98,26 @@ router.post('/stage', jwt({secret: config.odi.auth_pubkey}), function(req, res, 
 
 router.post('/register', function(req, res, next) {
     var entry = new db.Entries({
-        task_id: request.body.id,
-        name: request.body.name,
-        desc: request.body.desc,
-        created_date: request.body.created_date,
-        created_user: request.body.created_user,
-        status: request.body.status,
-        host: request.body.host,
-        working_dir: request.body.working_dir,
-        app_name: request.body.app_name
+        task_id: req.body.id,
+        name: req.body.name,
+        desc: req.body.desc,
+        created_date: req.body.created_date,
+        created_user: req.body.created_user,
+        status: req.body.status,
+        host: req.body.host,
+        working_dir: req.body.working_dir,
+        app_name: req.body.app_name
     });
 
     entry.save(function(err) {
-        if (err)
-            throw err;
-        else
+        if (err){
+            return next(err);
+        }
+        else{
             console.log('save user successfully...');
+            res.json({status: "ok"});
+        }
+
     });
 });
 
