@@ -96,4 +96,26 @@ router.post('/stage', jwt({secret: config.odi.auth_pubkey}), function(req, res, 
 });
 */
 
+router.post('/register', function(req, res, next) {
+    var entry = new db.Entries({
+        task_id: request.body.id,
+        name: request.body.name,
+        desc: request.body.desc,
+        created_date: request.body.created_date,
+        created_user: request.body.created_user,
+        status: request.body.status,
+        host: request.body.host,
+        working_dir: request.body.working_dir,
+        app_name: request.body.app_name
+    });
+
+    entry.save(function(err) {
+        if (err)
+            throw err;
+        else
+            console.log('save user successfully...');
+    });
+});
+
+
 module.exports = router;

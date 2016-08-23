@@ -7,7 +7,7 @@ exports.auth = {
     pubkey: fs.readFileSync('/home/hayashis/git/auth/api/config/auth.pub'),
 }
 
-exports.mongodb = "mongodb://soichi7.ppa.iu.edu:27018/odi";
+exports.mongodb = "mongodb://localhost:27017/onero";
 
 exports.express = {
     //host: 0.0.0.0,
