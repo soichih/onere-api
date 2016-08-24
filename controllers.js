@@ -18,12 +18,13 @@ var db = require('./models');
  * @apiSuccess {String} status 'ok' or 'failed'
  */
 router.get('/health', function(req, res) {
+    //TODO...
     res.json({status: 'ok'});
 });
 
 /**
- * @api {get} /entry            Query Registrations
- * @apiDescription              Query registered ONORE entrires
+ * @api {get} /application      Query Applications
+ * @apiDescription              Query applications registered
  *
  * @apiParam {Object} find      Optional Mongo find query - defaults to {}
  * @apiParam {Object} sort      Optional Mongo sort object - defaults to {}
@@ -36,88 +37,117 @@ router.get('/health', function(req, res) {
  *
  * @apiSuccess {Object[]} resources        Resource detail
  */
-router.get('/entry', jwt({secret: config.auth.pubkey}), function(req, res, next) {
+router.get('/application', jwt({secret: config.auth.pubkey}), function(req, res, next) {
     var find = {};
     if(req.query.find) find = JSON.parse(req.query.find);
-
-    //TODO - I need to map SCA group ID (numeric) to ODI PROP IDs and apply filter based on it
-    //(most likely maintained through ODI service?)
-    //for now, only search for test PROPID (except mastercals)
-    //if(!~find.type.indexOf("master_")) find['headers.PROPID'] = 'test';
     logger.debug(find);
 
-    db.Entries.find(find)
+    db.Applications.find(find)
     .select(req.query.select || 'create_date')
     .limit(req.query.limit || 100)
     .skip(req.query.skip || 0)
     .sort(req.query.sort || '_id')
-    .exec(function(err, entries) {
+    .exec(function(err, recs) {
         if(err) return next(err);
-        db.Entries.count(find).exec(function(err, count) {
+        db.Applications.count(find).exec(function(err, count) {
             if(err) return next(err);
-            res.json({entries: entries, count: count});
+            res.json({applications: recs, count: count});
         });
     });
 });
 
 /**
- * @api {get} /stage Request to stage ODI exposures
- * @apiDescription From a list of exposure_ids, it makes sure user has access to it,
- * find where the data is (on disk, sda, etc..) TODO - thaw them if necessary
- * and 
- * @apiParam {String[]} exposure_ids List of exposure IDs to thaw / stage
+ * @api {post} /application     Post Application
+ * @apiDescription              Register new application
+ *
+ * @apiParam {String} name      User friendly name for this container 
+ * @apiParam {String} container_url URL of the container registered on docker registry ("onere/123123131")
+ * @apiParam {Object} config    Application installed and how it's configured, etc..
+ *
  * @apiHeader {String} authorization A valid JWT token "Bearer: xxxxx"
  *
- * @apiSuccess {Object[]} exposures staged
+ * @apiSuccess {Object[]}       Application record registered
  */
-/*
-router.post('/stage', jwt({secret: config.odi.auth_pubkey}), function(req, res, next) {
-    var exposure_ids = req.body.exposure_ids;
-    var find = {
-        'headers.PROPID': {$in: ['test']}, //TODO apply realy access control
-        '_id': {$in: [exposure_ids]},
-    };
-    db.Exposures.find(find)
-    .select('logical_id') 
-    .exec(function(err, exposures) {
-        if(err) return next(err);
+router.post('/application', jwt({secret: config.auth.pubkey}), function(req, res, next) {
+    //override some fieds
+    req.body.user_id = req.user.sub;
 
-        //ssh to karst and setup 
-        var conn = new Client();
-        conn.on('ready', function() {
-        });
-        conn.connect({
-            host: config.odi.host,
-            username: config.odi.username,
-            privateKey: config.odi.pkey,
-        });
-        res.json({status: "ok"});
+    logger.debug("application posted");
+    logger.debug(req.body);
+    
+    //TODO prevent user from re-registering / overriding existing entries with the same container_url
+
+    //now save
+    var application = new db.Applications(req.body);
+    application.save(function(err) {
+        if (err) return next(err); 
+        logger.debug('application registered...');
+        res.json(application);
     });
 });
-*/
 
-router.post('/register', function(req, res, next) {
-    var entry = new db.Entries({
-        task_id: req.body.id,
-        name: req.body.name,
-        desc: req.body.desc,
-        created_date: req.body.created_date,
-        created_user: req.body.created_user,
-        status: req.body.status,
-        host: req.body.host,
-        working_dir: req.body.working_dir,
-        app_name: req.body.app_name
+/**
+ * @api {get} /dataset          Query datasets
+ * @apiDescription              Query applications registered
+ *
+ * @apiParam {Object} find      Optional Mongo find query - defaults to {}
+ * @apiParam {Object} sort      Optional Mongo sort object - defaults to {}
+ * @apiParam {String} select    Optional Fields to load - defaults to 'logical_id'
+ * @apiParam {Number} limit     Optional Maximum number of records to return - defaults to 100
+ * @apiParam {Number} skip      Optional Record offset for pagination
+ *
+ * @apiHeader {String} authorization 
+ *                              A valid JWT token "Bearer: xxxxx"
+ *
+ * @apiSuccess {Object[]} resources        Resource detail
+ */
+router.get('/dataset', jwt({secret: config.auth.pubkey}), function(req, res, next) {
+    var find = {};
+    if(req.query.find) find = JSON.parse(req.query.find);
+    logger.debug(find);
+
+    db.Datasets.find(find)
+    .select(req.query.select || 'create_date')
+    .limit(req.query.limit || 100)
+    .skip(req.query.skip || 0)
+    .sort(req.query.sort || '_id')
+    .exec(function(err, recs) {
+        if(err) return next(err);
+        db.Datasets.count(find).exec(function(err, count) {
+            if(err) return next(err);
+            res.json({datasets: recs, count: count});
+        });
     });
+});
 
-    entry.save(function(err) {
-        if (err){
-            return next(err);
-        }
-        else{
-            console.log('save user successfully...');
-            res.json({status: "ok"});
-        }
 
+/**
+ * @api {post} /dataset         Post Dataset
+ * @apiDescription              Register new dataset
+ *
+ * @apiParam {String} name      User friendly name for this container 
+ *
+ * @apiParam {String} storage   Name of the storage system used 
+ * @apiParam {String} path      Path where the .tar.gz is stored on above storage 
+ *
+ * @apiParam {Object} config    Metadata for this dataset (TODO..)
+ *
+ * @apiHeader {String} authorization A valid JWT token "Bearer: xxxxx"
+ *
+ * @apiSuccess {Object[]}       Dataset record registered
+ */
+router.post('/dataset', jwt({secret: config.auth.pubkey}), function(req, res, next) {
+    //override some fieds
+    req.body.user_id = req.user.sub;
+    
+    //TODO prevent user from re-registering / overriding existing entries with the same storage/path
+
+    //now save
+    var dataset = new db.Datasets(req.body);
+    dataset.save(function(err) {
+        if (err) return next(err); 
+        logger.debug('dataset registered...');
+        res.json(dataset);
     });
 });
 

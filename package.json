@@ -25,6 +25,10 @@
     "winston": "^2.2.0"
   },
   "devDependencies": {
+    "coveralls": "^2.11.9",
+    "supertest": "^1.2.0",
+    "mocha": "^2.5.3",
+    "istanbul": "^0.4.4",
     "supertest": "^1.2.0"
   },
   "repository": {

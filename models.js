@@ -37,8 +37,8 @@ exports.disconnect = function(cb) {
 // exports.Entries = mongoose.model('Entries', entriesSchema);
 
 
+/*
 var entriesSchema = mongoose.Schema({
-
     task_id: Number,
     name: String,
     desc: String,
@@ -69,4 +69,46 @@ var entriesSchema = mongoose.Schema({
         
 });
 exports.Entries = mongoose.model('Entries', entriesSchema);
+*/
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+exports.Datasets = mongoose.model('Datasets', 
+    mongoose.Schema({
+        user_id: {type: String, index: true},
+        gids: [ Number ], //list of auth service group IDs that should have access to this data
+
+        name: String, //name of the dataset
+
+        storage: String, //storage system used to store this datase
+        path: String, //location of this dataset with in the storage.
+        
+        //any metadata associated with this dataset (data type, applications to be used for, etc..)
+        config: mongoose.Schema.Types.Mixed, 
+
+        create_date: { type: Date, default: Date.now },
+    })
+);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+exports.Applications = mongoose.model('Applications', 
+    mongoose.Schema({
+        user_id: {type: String, index: true},
+        
+        //application is open to everyone
+        //gids: [ Number ], //list of auth service group IDs
+
+        name: String, //user friendly name for this container
+
+        container_url: String, //name of the container ("myrepo:5000/registry-demo")
+
+        //any metadata associated with this container (TODO..)
+        config: mongoose.Schema.Types.Mixed, 
+
+        create_date: { type: Date, default: Date.now },
+    })
+);
+
+
 
