@@ -38,5 +38,77 @@ describe('/application', function() {
             done();
         });
     });
+
+    it('should find an application', function(done) {
+        request(app)
+        .get('/application')
+        .set('Authorization', 'Bearer '+config.test.jwt)
+        .set('Accept', 'application/json')
+        .query({
+            find: JSON.stringify({_id: application._id}),
+            limit: 1,
+            select: 'name create_date user_id',
+        })
+        .expect(200)
+        .end(function(err, res) {
+            if(err) return done(err);
+            var recs = res.body.applications;
+            //console.dir(recs);
+            assert(recs.length == 1);
+            assert(recs[0].user_id == "test_service");
+            assert(recs[0].name == "test name");
+            done();
+        });
+    });
+
+    //TODO - remove it?
+});
+
+describe('/dataset', function() {
+    var dataset = null;
+    it('should create dataset', function(done) {
+        request(app)
+        .post('/dataset')
+        .set('Authorization', 'Bearer '+config.test.jwt)
+        .set('Accept', 'application/json')
+        .send({
+            name: "test name",
+            storage: "dc2",
+            path: "/N/dc2/somewhere", 
+            config: { "app1": "test", "app2": "whatever" },
+        })
+        .expect(200)
+        .end(function(err, res) {
+            if(err) return done(err);
+            dataset = res.body;
+            assert(dataset.user_id == "test_service");
+            assert(dataset.storage == "dc2");
+            done();
+        });
+    });
+
+    it('should find the dataset', function(done) {
+        request(app)
+        .get('/dataset')
+        .set('Authorization', 'Bearer '+config.test.jwt)
+        .set('Accept', 'application/json')
+        .query({
+            find: JSON.stringify({_id: dataset._id}),
+            limit: 1,
+            select: 'name create_date user_id',
+        })
+        .expect(200)
+        .end(function(err, res) {
+            if(err) return done(err);
+            var recs = res.body.datasets;
+            //console.dir(recs);
+            assert(recs.length == 1);
+            assert(recs[0].user_id == "test_service");
+            assert(recs[0].name == "test name");
+            done();
+        });
+    });
+
+    //TODO - remove it?
     
 });

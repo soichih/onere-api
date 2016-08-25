@@ -1,7 +1,7 @@
 {
-  "name": "odi",
+  "name": "onere-api",
   "version": "1.0.0",
-  "description": "ODI REST API server",
+  "description": "ONERE REST API server",
   "main": "index.js",
   "scripts": {
     "test": "mocha --reporter spec",

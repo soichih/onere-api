@@ -23,6 +23,7 @@ router.get('/health', function(req, res) {
 });
 
 /**
+ * @apiGroup Application
  * @api {get} /application      Query Applications
  * @apiDescription              Query applications registered
  *
@@ -57,6 +58,7 @@ router.get('/application', jwt({secret: config.auth.pubkey}), function(req, res,
 });
 
 /**
+ * @apiGroup Application
  * @api {post} /application     Post Application
  * @apiDescription              Register new application
  *
@@ -72,8 +74,8 @@ router.post('/application', jwt({secret: config.auth.pubkey}), function(req, res
     //override some fieds
     req.body.user_id = req.user.sub;
 
-    logger.debug("application posted");
-    logger.debug(req.body);
+    //logger.debug("application posted");
+    //logger.debug(req.body);
     
     //TODO prevent user from re-registering / overriding existing entries with the same container_url
 
@@ -87,6 +89,7 @@ router.post('/application', jwt({secret: config.auth.pubkey}), function(req, res
 });
 
 /**
+ * @apiGroup Dataset
  * @api {get} /dataset          Query datasets
  * @apiDescription              Query applications registered
  *
@@ -122,6 +125,7 @@ router.get('/dataset', jwt({secret: config.auth.pubkey}), function(req, res, nex
 
 
 /**
+ * @apiGroup Dataset
  * @api {post} /dataset         Post Dataset
  * @apiDescription              Register new dataset
  *

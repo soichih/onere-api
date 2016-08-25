@@ -1,28 +1,6 @@
 define({ "api": [
   {
-    "type": "get",
-    "url": "/health",
-    "title": "Get current service status",
-    "name": "Health",
-    "group": "System",
-    "success": {
-      "fields": {
-        "Success 200": [
-          {
-            "group": "Success 200",
-            "type": "String",
-            "optional": false,
-            "field": "status",
-            "description": "<p>'ok' or 'failed'</p>"
-          }
-        ]
-      }
-    },
-    "version": "0.0.0",
-    "filename": "./controllers.js",
-    "groupTitle": "System"
-  },
-  {
+    "group": "Application",
     "type": "get",
     "url": "/application",
     "title": "Query Applications",
@@ -96,11 +74,75 @@ define({ "api": [
     },
     "version": "0.0.0",
     "filename": "./controllers.js",
-    "group": "_usr_local_git_onere_api_controllers_js",
-    "groupTitle": "_usr_local_git_onere_api_controllers_js",
+    "groupTitle": "Application",
     "name": "GetApplication"
   },
   {
+    "group": "Application",
+    "type": "post",
+    "url": "/application",
+    "title": "Post Application",
+    "description": "<p>Register new application</p>",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "name",
+            "description": "<p>User friendly name for this container</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "container_url",
+            "description": "<p>URL of the container registered on docker registry (&quot;onere/123123131&quot;)</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "Object",
+            "optional": false,
+            "field": "config",
+            "description": "<p>Application installed and how it's configured, etc..</p>"
+          }
+        ]
+      }
+    },
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": false,
+            "field": "authorization",
+            "description": "<p>A valid JWT token &quot;Bearer: xxxxx&quot;</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Object[]",
+            "optional": false,
+            "field": "Application",
+            "description": "<p>record registered</p>"
+          }
+        ]
+      }
+    },
+    "version": "0.0.0",
+    "filename": "./controllers.js",
+    "groupTitle": "Application",
+    "name": "PostApplication"
+  },
+  {
+    "group": "Dataset",
     "type": "get",
     "url": "/dataset",
     "title": "Query datasets",
@@ -174,75 +216,11 @@ define({ "api": [
     },
     "version": "0.0.0",
     "filename": "./controllers.js",
-    "group": "_usr_local_git_onere_api_controllers_js",
-    "groupTitle": "_usr_local_git_onere_api_controllers_js",
+    "groupTitle": "Dataset",
     "name": "GetDataset"
   },
   {
-    "type": "post",
-    "url": "/application",
-    "title": "Post Application",
-    "description": "<p>Register new application</p>",
-    "parameter": {
-      "fields": {
-        "Parameter": [
-          {
-            "group": "Parameter",
-            "type": "String",
-            "optional": false,
-            "field": "name",
-            "description": "<p>User friendly name for this container</p>"
-          },
-          {
-            "group": "Parameter",
-            "type": "String",
-            "optional": false,
-            "field": "container_url",
-            "description": "<p>URL of the container registered on docker registry (&quot;onere/123123131&quot;)</p>"
-          },
-          {
-            "group": "Parameter",
-            "type": "Object",
-            "optional": false,
-            "field": "config",
-            "description": "<p>Application installed and how it's configured, etc..</p>"
-          }
-        ]
-      }
-    },
-    "header": {
-      "fields": {
-        "Header": [
-          {
-            "group": "Header",
-            "type": "String",
-            "optional": false,
-            "field": "authorization",
-            "description": "<p>A valid JWT token &quot;Bearer: xxxxx&quot;</p>"
-          }
-        ]
-      }
-    },
-    "success": {
-      "fields": {
-        "Success 200": [
-          {
-            "group": "Success 200",
-            "type": "Object[]",
-            "optional": false,
-            "field": "Application",
-            "description": "<p>record registered</p>"
-          }
-        ]
-      }
-    },
-    "version": "0.0.0",
-    "filename": "./controllers.js",
-    "group": "_usr_local_git_onere_api_controllers_js",
-    "groupTitle": "_usr_local_git_onere_api_controllers_js",
-    "name": "PostApplication"
-  },
-  {
+    "group": "Dataset",
     "type": "post",
     "url": "/dataset",
     "title": "Post Dataset",
@@ -309,9 +287,31 @@ define({ "api": [
     },
     "version": "0.0.0",
     "filename": "./controllers.js",
-    "group": "_usr_local_git_onere_api_controllers_js",
-    "groupTitle": "_usr_local_git_onere_api_controllers_js",
+    "groupTitle": "Dataset",
     "name": "PostDataset"
+  },
+  {
+    "type": "get",
+    "url": "/health",
+    "title": "Get current service status",
+    "name": "Health",
+    "group": "System",
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "status",
+            "description": "<p>'ok' or 'failed'</p>"
+          }
+        ]
+      }
+    },
+    "version": "0.0.0",
+    "filename": "./controllers.js",
+    "groupTitle": "System"
   },
   {
     "success": {
