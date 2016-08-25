@@ -46,7 +46,7 @@ describe('/application', function() {
         .set('Accept', 'application/json')
         .query({
             find: JSON.stringify({_id: application._id}),
-            limit: 1,
+            range: 1,
             select: 'name create_date user_id',
         })
         .expect(200)
@@ -92,9 +92,9 @@ describe('/dataset', function() {
         .get('/dataset')
         .set('Authorization', 'Bearer '+config.test.jwt)
         .set('Accept', 'application/json')
-        .query({
+            .query({
             find: JSON.stringify({_id: dataset._id}),
-            limit: 1,
+            range: 1,
             select: 'name create_date user_id',
         })
         .expect(200)
