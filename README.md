@@ -1,6 +1,6 @@
-# ONORE-API
+# ONERE-API
 
-ONORE REST API server
+ONERE REST API server
 
 Testing registering data
 ==========================
