@@ -1,4 +1,5 @@
-# ONORE-API
+# ONERE-API
 
-ONORE REST API server
+ONERE REST API server
 
+Open Neuroscience Embedded Reproducibility Environment.
