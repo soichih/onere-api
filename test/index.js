@@ -46,7 +46,7 @@ describe('/application', function() {
         .set('Accept', 'application/json')
         .query({
             find: JSON.stringify({_id: application._id}),
-            range: 1,
+            limit: 1,
             select: 'name create_date user_id',
         })
         .expect(200)
@@ -94,7 +94,7 @@ describe('/dataset', function() {
         .set('Accept', 'application/json')
             .query({
             find: JSON.stringify({_id: dataset._id}),
-            range: 1,
+            limit: 1,
             select: 'name create_date user_id',
         })
         .expect(200)
