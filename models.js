@@ -8,7 +8,9 @@ var winston = require('winston');
 var config = require('./config');
 var logger = new winston.Logger(config.logger.winston);
 
-mongoose.set('debug', true);
+if(config.debug) {
+    mongoose.set('debug', true);
+}
 
 exports.init = function(cb) {
     mongoose.connect(config.mongodb, {}, function(err) {

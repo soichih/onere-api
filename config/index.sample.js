@@ -3,11 +3,13 @@
 var fs = require('fs');
 var winston = require('winston');
 
+exports.debug = true;
+
 exports.auth = {
     pubkey: fs.readFileSync('/home/hayashis/git/auth/api/config/auth.pub'),
 }
 
-exports.mongodb = "mongodb://localhost:27017/onero";
+exports.mongodb = "mongodb://localhost:27017/onere";
 
 exports.express = {
     //host: 0.0.0.0,
