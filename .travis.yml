@@ -19,7 +19,5 @@ env:
 # Send coverage data to Coveralls
 after_script: "cat coverage/lcov.info | node_modules/coveralls/bin/coveralls.js"
 
-#notifications:
-#  slack: research-technologies:izdZdry8NEjrDmTjbHL5dCA8
-
-
+notifications:
+  slack: pestillilab:aoYIQOothA5mB6fYrw3802Zj
