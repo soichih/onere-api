@@ -82,7 +82,7 @@ describe('/dataset', function() {
             if(err) return done(err);
             dataset = res.body;
             assert(dataset.user_id == "test_service");
-            assert(dataset.storage == "dc2");
+            assert(dataset.config.app1 == "test");
             done();
         });
     });

@@ -233,21 +233,7 @@ define({ "api": [
             "type": "String",
             "optional": false,
             "field": "name",
-            "description": "<p>User friendly name for this container</p>"
-          },
-          {
-            "group": "Parameter",
-            "type": "String",
-            "optional": false,
-            "field": "storage",
-            "description": "<p>Name of the storage system used</p>"
-          },
-          {
-            "group": "Parameter",
-            "type": "String",
-            "optional": false,
-            "field": "path",
-            "description": "<p>Path where the .tar.gz is stored on above storage</p>"
+            "description": "<p>User friendly name for this container</p> <p>// * @apiParam {String} storage   Name of the storage system used // * @apiParam {String} path      Path where the .tar.gz is stored on above storage</p>"
           },
           {
             "group": "Parameter",

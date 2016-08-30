@@ -82,8 +82,9 @@ exports.Datasets = mongoose.model('Datasets',
 
         name: String, //name of the dataset
 
-        storage: String, //storage system used to store this datase
-        path: String, //location of this dataset with in the storage.
+        //TODO -- not sure what's the best way to store this maybe the _id is good enough.
+        //storage: String, //storage system used to store this datase
+        //path: String, //location of this dataset within the storage.
         
         //any metadata associated with this dataset (data type, applications to be used for, etc..)
         config: mongoose.Schema.Types.Mixed, 

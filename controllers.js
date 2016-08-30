@@ -131,8 +131,8 @@ router.get('/dataset', jwt({secret: config.auth.pubkey}), function(req, res, nex
  *
  * @apiParam {String} name      User friendly name for this container 
  *
- * @apiParam {String} storage   Name of the storage system used 
- * @apiParam {String} path      Path where the .tar.gz is stored on above storage 
+// * @apiParam {String} storage   Name of the storage system used 
+// * @apiParam {String} path      Path where the .tar.gz is stored on above storage 
  *
  * @apiParam {Object} config    Metadata for this dataset (TODO..)
  *
