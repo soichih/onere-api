@@ -81,6 +81,7 @@ exports.Datasets = mongoose.model('Datasets',
         gids: [ Number ], //list of auth service group IDs that should have access to this data
 
         name: String, //name of the dataset
+        desc: String, 
 
         //TODO -- not sure what's the best way to store this maybe the _id is good enough.
         //storage: String, //storage system used to store this datase

@@ -23,7 +23,7 @@ router.get('/health', function(req, res) {
 });
 
 /**
- * @apiGroup Application
+ * @apiGroup Service
  * @api {get} /application      Query Applications
  * @apiDescription              Query applications registered
  *
@@ -38,6 +38,7 @@ router.get('/health', function(req, res) {
  *
  * @apiSuccess {Object[]} resources        Resource detail
  */
+/*
 router.get('/application', jwt({secret: config.auth.pubkey}), function(req, res, next) {
     var find = {};
     if(req.query.find) find = JSON.parse(req.query.find);
@@ -56,6 +57,7 @@ router.get('/application', jwt({secret: config.auth.pubkey}), function(req, res,
         });
     });
 });
+*/
 
 /**
  * @apiGroup Application
@@ -63,6 +65,8 @@ router.get('/application', jwt({secret: config.auth.pubkey}), function(req, res,
  * @apiDescription              Register new application
  *
  * @apiParam {String} name      User friendly name for this container 
+ * @apiParam {String} desc      Description for this container
+ *
  * @apiParam {String} container_url URL of the container registered on docker registry ("onere/123123131")
  * @apiParam {Object} config    Application installed and how it's configured, etc..
  *
@@ -70,6 +74,7 @@ router.get('/application', jwt({secret: config.auth.pubkey}), function(req, res,
  *
  * @apiSuccess {Object[]}       Application record registered
  */
+/*
 router.post('/application', jwt({secret: config.auth.pubkey}), function(req, res, next) {
     //override some fieds
     req.body.user_id = req.user.sub;
@@ -87,6 +92,7 @@ router.post('/application', jwt({secret: config.auth.pubkey}), function(req, res
         res.json(application);
     });
 });
+*/
 
 /**
  * @apiGroup Dataset
@@ -101,8 +107,6 @@ router.post('/application', jwt({secret: config.auth.pubkey}), function(req, res
  *
  * @apiHeader {String} authorization 
  *                              A valid JWT token "Bearer: xxxxx"
- *
- * @apiSuccess {Object[]} resources        Resource detail
  */
 router.get('/dataset', jwt({secret: config.auth.pubkey}), function(req, res, next) {
     var find = {};
@@ -130,21 +134,25 @@ router.get('/dataset', jwt({secret: config.auth.pubkey}), function(req, res, nex
  * @apiDescription              Register new dataset
  *
  * @apiParam {String} name      User friendly name for this container 
+ * @apiParam {String} desc      Description for this dataset 
  *
-// * @apiParam {String} storage   Name of the storage system used 
-// * @apiParam {String} path      Path where the .tar.gz is stored on above storage 
+// * @apiParam {String} storage Name of the storage system used 
+// * @apiParam {String} path    Path where the .tar.gz is stored on above storage 
  *
  * @apiParam {Object} config    Metadata for this dataset (TODO..)
  *
  * @apiHeader {String} authorization A valid JWT token "Bearer: xxxxx"
  *
- * @apiSuccess {Object[]}       Dataset record registered
+ * @apiSuccess {Object}         Dataset record registered
  */
 router.post('/dataset', jwt({secret: config.auth.pubkey}), function(req, res, next) {
     //override some fieds
     req.body.user_id = req.user.sub;
     
     //TODO prevent user from re-registering / overriding existing entries with the same storage/path
+    
+    //req.body.storage = "dc2";
+    //req.body.path = "/N/dc2/projects/lifebid/onere/datasets"; //make it configurable
 
     //now save
     var dataset = new db.Datasets(req.body);
@@ -155,5 +163,64 @@ router.post('/dataset', jwt({secret: config.auth.pubkey}), function(req, res, ne
     });
 });
 
+/**
+ * @apiGroup Dataset
+ * @api {put} /dataset/:dataset_id
+ *                              Put Dataset
+ * @apiDescription              Update dataset
+ *
+ * @apiParam {String} [name]    User friendly name for this container 
+ * @apiParam {String} [desc]    Description for this dataset 
+ *
+ * @apiParam {Object} config    Metadata for this dataset (TODO..)
+ *
+ * @apiHeader {String} authorization A valid JWT token "Bearer: xxxxx"
+ *
+ * @apiSuccess {Object}         Dataset object updated
+ */
+router.put('/dataset/:dataset_id', jwt({secret: config.auth.pubkey}), function(req, res, next) {
+    var dataset_id  = req.params.dataset_id;
+    db.Datasets.findById(dataset_id, function(err, dataset) {
+        if(err) return next(err);
+        if(!dataset) return res.status(404).end();
+        //let's restrict to the same user for now.. It should probably allow anyone in the project?
+        if(dataset.user_id != req.user.sub) return res.status(401).end("user_id mismatch .. req.user.sub:"+req.user.sub);
+
+        //logger.debug("updating dataset "+dataset_id);
+        //console.dir(req.body);
+
+        if(req.body.name) dataset.name = req.body.name;
+        if(req.body.desc) dataset.desc = req.body.desc;
+        if(req.body.config) dataset.config = req.body.config;
+
+        dataset.save(function(err) {
+            logger.debug("dateset updated");
+            logger.debug(dataset.toString());
+            if(err) return next(err);
+            res.json(dataset);
+        });
+    });
+});
+
+/*
+router.put('/dataset/:dataset_id/addfile', jwt({secret: config.auth.pubkey}), function(req, res, next) {
+    var dataset_id  = req.params.dataset_id;
+    db.Datasets.findById(dataset_id, function(err, dataset) {
+        if(err) return next(err);
+        if(!dataset) return res.status(404).end();
+        //let's restrict to the same user for now.. It should probably allow anyone in the project?
+        if(dataset.user_id != req.user.sub) return res.status(401).end("user_id mismatch .. req.user.sub:"+req.user.sub);
+
+        if(!dataset.config.files) dataset.config.files = [];
+
+        dataset.save(function(err) {
+            logger.debug("dateset updated");
+            logger.debug(dataset.toString());
+            if(err) return next(err);
+            res.json(dataset);
+        });
+    });
+});
+*/
 
 module.exports = router;

@@ -23,6 +23,7 @@ exports.test = {
 
 exports.logger = {
     winston: {
+        requestWhitelist: ['url', /*'headers',*/ 'method', 'httpVersion', 'originalUrl', 'query'],
         transports: [
             //display all logs to console
             new winston.transports.Console({
