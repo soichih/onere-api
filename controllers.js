@@ -38,7 +38,6 @@ router.get('/health', function(req, res) {
  *
  * @apiSuccess {Object[]} resources        Resource detail
  */
-/*
 router.get('/application', jwt({secret: config.auth.pubkey}), function(req, res, next) {
     var find = {};
     if(req.query.find) find = JSON.parse(req.query.find);
@@ -57,31 +56,26 @@ router.get('/application', jwt({secret: config.auth.pubkey}), function(req, res,
         });
     });
 });
-*/
 
 /**
  * @apiGroup Application
  * @api {post} /application     Post Application
  * @apiDescription              Register new application
  *
- * @apiParam {String} name      User friendly name for this container 
- * @apiParam {String} desc      Description for this container
+ * @apiParam {String} name      User friendly name for this app
+ * @apiParam {String} desc      Description for this app
  *
- * @apiParam {String} container_url URL of the container registered on docker registry ("onere/123123131")
+ * @apiParam {String} service   Name of SCA service that contains this app (soichih/sca-service-docker, for example)
  * @apiParam {Object} config    Application installed and how it's configured, etc..
  *
  * @apiHeader {String} authorization A valid JWT token "Bearer: xxxxx"
  *
- * @apiSuccess {Object[]}       Application record registered
+ * @apiSuccess {Object}         Application record registered
  */
-/*
 router.post('/application', jwt({secret: config.auth.pubkey}), function(req, res, next) {
     //override some fieds
     req.body.user_id = req.user.sub;
 
-    //logger.debug("application posted");
-    //logger.debug(req.body);
-    
     //TODO prevent user from re-registering / overriding existing entries with the same container_url
 
     //now save
@@ -92,7 +86,45 @@ router.post('/application', jwt({secret: config.auth.pubkey}), function(req, res
         res.json(application);
     });
 });
-*/
+
+/**
+ * @apiGroup Application
+ * @api {put} /application/:application_id
+ *                              Put Application
+ * @apiDescription              Update Application
+ *
+ * @apiParam {String} [name]    User friendly name for this app
+ * @apiParam {String} [desc]    Description for this app
+ *
+ * @apiParam {String} [service] Name of SCA service that contains this app (soichih/sca-service-docker, for example)
+ * @apiParam {Object} [config]  Config for this app
+ *
+ * @apiHeader {String} authorization A valid JWT token "Bearer: xxxxx"
+ *
+ * @apiSuccess {Object}         Application object updated
+ */
+router.put('/application/:application_id', jwt({secret: config.auth.pubkey}), function(req, res, next) {
+    var application_id  = req.params.application_id;
+    db.Applications.findById(application_id, function(err, application) {
+        if(err) return next(err);
+        if(!application) return res.status(404).end();
+        //let's restrict to the same user for now.. It should probably allow anyone in the project?
+        console.dir(application);
+        if(application.user_id != req.user.sub) return res.status(401).end("user_id mismatch .. req.user.sub:"+req.user.sub);
+
+        if(req.body.name) application.name = req.body.name;
+        if(req.body.desc) application.desc = req.body.desc;
+        if(req.body.service) application.service = req.body.config;
+        if(req.body.config) application.config = req.body.config;
+
+        application.save(function(err) {
+            //logger.debug("application updated");
+            //logger.debug(application.toString());
+            if(err) return next(err);
+            res.json(application);
+        });
+    });
+});
 
 /**
  * @apiGroup Dataset
@@ -194,8 +226,8 @@ router.put('/dataset/:dataset_id', jwt({secret: config.auth.pubkey}), function(r
         if(req.body.config) dataset.config = req.body.config;
 
         dataset.save(function(err) {
-            logger.debug("dateset updated");
-            logger.debug(dataset.toString());
+            //logger.debug("dateset updated");
+            //logger.debug(dataset.toString());
             if(err) return next(err);
             res.json(dataset);
         });

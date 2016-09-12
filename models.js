@@ -78,7 +78,7 @@ exports.Entries = mongoose.model('Entries', entriesSchema);
 exports.Datasets = mongoose.model('Datasets', 
     mongoose.Schema({
         user_id: {type: String, index: true},
-        gids: [ Number ], //list of auth service group IDs that should have access to this data
+        //gids: [ Number ], //list of auth service group IDs that should have access to this data
 
         name: String, //name of the dataset
         desc: String, 
@@ -99,20 +99,19 @@ exports.Datasets = mongoose.model('Datasets',
 exports.Applications = mongoose.model('Applications', 
     mongoose.Schema({
         user_id: {type: String, index: true},
-        
-        //application is open to everyone
-        //gids: [ Number ], //list of auth service group IDs
+        //gids: [ Number ], //list of auth service group IDs that should have access to this data
 
         name: String, //user friendly name for this container
+        desc: String, 
 
-        container_url: String, //name of the container ("myrepo:5000/registry-demo")
+        //SCA service which will execute this app 
+        //(like soichih/sca-service-docker, soichih/sca-service-git)
+        service: String, 
 
-        //any metadata associated with this container (TODO..)
+        //configuration for the service
         config: mongoose.Schema.Types.Mixed, 
 
         create_date: { type: Date, default: Date.now },
     })
 );
-
-
 
