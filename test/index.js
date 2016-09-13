@@ -61,7 +61,18 @@ describe('/application', function() {
         });
     });
 
-    //TODO - remove it?
+    it('shoud remove an application', function(done) {
+        request(app)
+        .delete('/application/'+application._id)
+        .set('Authorization', 'Bearer '+config.test.jwt)
+        .set('Accept', 'application/json')
+        .expect(200)
+        .end(function(err, res) {
+            if(err) return done(err);
+            done();
+        });
+    
+    });
 });
 
 describe('/dataset', function() {
@@ -109,6 +120,16 @@ describe('/dataset', function() {
         });
     });
 
-    //TODO - remove it?
+    it('shoud remove a dataset', function(done) {
+        request(app)
+        .delete('/dataset/'+dataset._id)
+        .set('Authorization', 'Bearer '+config.test.jwt)
+        .set('Accept', 'application/json')
+        .expect(200)
+        .end(function(err, res) {
+            if(err) return done(err);
+            done();
+        });
+    });
     
 });

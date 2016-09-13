@@ -109,12 +109,11 @@ router.put('/application/:application_id', jwt({secret: config.auth.pubkey}), fu
         if(err) return next(err);
         if(!application) return res.status(404).end();
         //let's restrict to the same user for now.. It should probably allow anyone in the project?
-        console.dir(application);
         if(application.user_id != req.user.sub) return res.status(401).end("user_id mismatch .. req.user.sub:"+req.user.sub);
 
         if(req.body.name) application.name = req.body.name;
         if(req.body.desc) application.desc = req.body.desc;
-        if(req.body.service) application.service = req.body.config;
+        if(req.body.service) application.service = req.body.service;
         if(req.body.config) application.config = req.body.config;
 
         application.save(function(err) {
@@ -123,6 +122,23 @@ router.put('/application/:application_id', jwt({secret: config.auth.pubkey}), fu
             if(err) return next(err);
             res.json(application);
         });
+    });
+});
+
+/**
+ * @apiGroup                    Application
+ * @api {delete} /application/:application_id 
+ *                              Remove registered application (only by the user registered it)
+ * @apiDescription              Physically remove an application registered on DB.
+ *
+ * @apiHeader {String} authorization 
+ *                              A valid JWT token "Bearer: xxxxx"
+ */
+router.delete('/application/:application_id', jwt({secret: config.auth.pubkey}), function(req, res, next) {
+    var id = req.params.application_id;
+    db.Applications.remove({_id: id, user_id: req.user.sub}, function(err) {
+        if(err) return next(err);
+        res.json({message: "application successfully removed"});
     });
 });
 
@@ -231,6 +247,23 @@ router.put('/dataset/:dataset_id', jwt({secret: config.auth.pubkey}), function(r
             if(err) return next(err);
             res.json(dataset);
         });
+    });
+});
+
+/**
+ * @apiGroup                    Dataset
+ * @api {delete} /dataset/:dataset_id
+ *                              Remove registered dataset (only by the user registered it)
+ * @apiDescription              Physically remove a dataset registered on DB.
+ *
+ * @apiHeader {String} authorization 
+ *                              A valid JWT token "Bearer: xxxxx"
+ */
+router.delete('/dataset/:dataset_id', jwt({secret: config.auth.pubkey}), function(req, res, next) {
+    var id = req.params.dataset_id;
+    db.Datasets.remove({_id: id, user_id: req.user.sub}, function(err) {
+        if(err) return next(err);
+        res.json({message: "Dataset successfully removed"});
     });
 });
 
