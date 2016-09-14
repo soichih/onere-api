@@ -34,6 +34,10 @@ router.get('/', jwt({secret: config.auth.pubkey}), function(req, res, next) {
     .limit(req.query.limit || 100)
     .skip(req.query.skip || 0)
     .sort(req.query.sort || '_id')
+    .populate('project_id', 'name desc')
+    .populate('dataset_id', 'name desc')
+    .populate('application_id', 'name desc config.type')
+    //.populate('application_id dataset_id')
     .exec(function(err, recs) {
         if(err) return next(err);
         db.Appdatas.count(find).exec(function(err, count) {

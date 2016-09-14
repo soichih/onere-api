@@ -155,23 +155,23 @@ exports.Applications = mongoose.model('Applications',
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 //joins application and data together and becomes a parent of all SCA tasks
-exports.Appdatas = mongoose.model('Appdatas', 
-    mongoose.Schema({
-        user_id: {type: String, index: true},
+var appdatas_schema = mongoose.Schema({
+    user_id: {type: String, index: true},
 
-        project_id: {type: mongoose.Schema.Types.ObjectId, ref: 'Projects'},
+    project_id: {type: mongoose.Schema.Types.ObjectId, ref: 'Projects'},
 
-        application_id: {type: mongoose.Schema.Types.ObjectId, ref: 'Applications'},
-        dataset_id: {type: mongoose.Schema.Types.ObjectId, ref: 'Datasets'},
+    application_id: {type: mongoose.Schema.Types.ObjectId, ref: 'Applications'},
+    dataset_id: {type: mongoose.Schema.Types.ObjectId, ref: 'Datasets'},
 
-        name: String, 
-        desc: String, 
+    name: String, 
+    desc: String, 
 
-        //config: mongoose.Schema.Types.Mixed, 
+    //config: mongoose.Schema.Types.Mixed, 
 
-        create_date: { type: Date, default: Date.now },
-    })
-);
+    create_date: { type: Date, default: Date.now },
+});
+appdatas_schema.index({name: 'text', desc: 'text'})
+exports.Appdatas = mongoose.model('Appdatas', appdatas_schema);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
