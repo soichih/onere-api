@@ -73,12 +73,47 @@ var entriesSchema = mongoose.Schema({
 exports.Entries = mongoose.model('Entries', entriesSchema);
 */
 
+exports.Projects = mongoose.model('Projects', 
+    mongoose.Schema({
+        user_id: {type: String, index: true}, //user created this project (PI)
+        admins: [ Number ], //list of users who can administer this project (co-PIs?)
+        members: [ Number ], //list of users who can access things under this project
+
+        name: String,
+        desc: String, 
+
+        config: mongoose.Schema.Types.Mixed, 
+        
+        /*
+        //should this be part of appdata? (need to ask franco)
+        publications: [
+            {
+                title: String,
+                authors: [{
+                    //type: String, //author / editor / compiler, etc..
+                    firstname: String,
+                    middlename: String,
+                    lastname: String,
+                    suffix: String,
+                }],
+                date: Date, //publish date
+                doi: String,
+            }
+        ],
+        */
+
+        create_date: { type: Date, default: Date.now },
+    })
+);
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 exports.Datasets = mongoose.model('Datasets', 
     mongoose.Schema({
         user_id: {type: String, index: true},
         //gids: [ Number ], //list of auth service group IDs that should have access to this data
+
+        project_id: {type: mongoose.Schema.Types.ObjectId, ref: 'Projects'},
 
         name: String, //name of the dataset
         desc: String, 
@@ -101,12 +136,14 @@ exports.Applications = mongoose.model('Applications',
         user_id: {type: String, index: true},
         //gids: [ Number ], //list of auth service group IDs that should have access to this data
 
+        project_id: {type: mongoose.Schema.Types.ObjectId, ref: 'Projects'},
+
         name: String, //user friendly name for this container
         desc: String, 
 
         //SCA service which will execute this app 
         //(like soichih/sca-service-docker, soichih/sca-service-git)
-        service: String, 
+        //service: String, 
 
         //configuration for the service
         config: mongoose.Schema.Types.Mixed, 
@@ -114,4 +151,28 @@ exports.Applications = mongoose.model('Applications',
         create_date: { type: Date, default: Date.now },
     })
 );
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+//joins application and data together and becomes a parent of all SCA tasks
+exports.Appdatas = mongoose.model('Appdatas', 
+    mongoose.Schema({
+        user_id: {type: String, index: true},
+
+        project_id: {type: mongoose.Schema.Types.ObjectId, ref: 'Projects'},
+
+        application_id: {type: mongoose.Schema.Types.ObjectId, ref: 'Applications'},
+        dataset_id: {type: mongoose.Schema.Types.ObjectId, ref: 'Datasets'},
+
+        name: String, 
+        desc: String, 
+
+        //config: mongoose.Schema.Types.Mixed, 
+
+        create_date: { type: Date, default: Date.now },
+    })
+);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
 
