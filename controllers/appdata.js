@@ -47,6 +47,17 @@ router.get('/', jwt({secret: config.auth.pubkey}), function(req, res, next) {
     });
 });
 
+//get a single appdata with everything populated
+//TODO - if (get) / will allow population override, I probably don't need this.. (currently used by /view/appdata)
+router.get('/:id', jwt({secret: config.auth.pubkey}), function(req, res, next) {
+    db.Appdatas.findOne({_id: req.params.id})
+    .populate('project_id dataset_id application_id')
+    .exec(function(err, rec) {
+        if(err) return next(err);
+        if(!rec) return res.status(404).end();
+        res.json(rec);
+    });
+});
 /**
  * @apiGroup Appdatas
  * @api {post} /appdata         Post Appdata
@@ -84,6 +95,9 @@ router.post('/', jwt({secret: config.auth.pubkey}), function(req, res, next) {
  *
  * @apiParam {String} [name]    User friendly name for this container 
  * @apiParam {String} [desc]    Description for this dataset 
+ * @apiParam {String} [project_id]      Project ID
+ * @apiParam {String} [application_id]  Application ID
+ * @apiParam {String} [dataset_id]      Dataset ID
  *
  * @apiParam {Object} config    Metadata for this dataset (TODO..)
  *
@@ -93,7 +107,7 @@ router.post('/', jwt({secret: config.auth.pubkey}), function(req, res, next) {
  */
 router.put('/:id', jwt({secret: config.auth.pubkey}), function(req, res, next) {
     var id = req.params.id;
-    db.Appdatas.findById(dataset_id, function(err, appdata) {
+    db.Appdatas.findById(id, function(err, appdata) {
         if(err) return next(err);
         if(!appdata) return res.status(404).end();
 
@@ -103,6 +117,15 @@ router.put('/:id', jwt({secret: config.auth.pubkey}), function(req, res, next) {
         if(req.body.name) appdata.name = req.body.name;
         if(req.body.desc) appdata.desc = req.body.desc;
         if(req.body.config) appdata.config = req.body.config;
+
+        //TODO - only allow setting it to project that user is mbmer of
+        if(req.body.project_id) appdata.project_id = req.body.project_id;
+
+        //TODO - only allow setting it to application that user owns or belongs to projects that user is member of
+        if(req.body.application_id) appdata.application_id = req.body.application_id;
+        //
+        //TODO - only allow setting it to dataset that user owns or belongs to projects that user is member of
+        if(req.body.dataset_id) appdata.dataset_id = req.body.dataset_id;
 
         appdata.save(function(err) {
             if(err) return next(err);

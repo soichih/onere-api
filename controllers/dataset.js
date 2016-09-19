@@ -56,6 +56,7 @@ router.get('/', jwt({secret: config.auth.pubkey}), function(req, res, next) {
 // * @apiParam {String} path    Path where the .tar.gz is stored on above storage 
  *
  * @apiParam {Object} config    Metadata for this dataset (TODO..)
+ * @apiParam [String] tags      List of tag/keyword strings
  *
  * @apiHeader {String} authorization A valid JWT token "Bearer: xxxxx"
  *
@@ -88,7 +89,8 @@ router.post('/', jwt({secret: config.auth.pubkey}), function(req, res, next) {
  * @apiParam {String} [name]    User friendly name for this container 
  * @apiParam {String} [desc]    Description for this dataset 
  *
- * @apiParam {Object} config    Metadata for this dataset (TODO..)
+ * @apiParam {Object} [config]  Metadata for this dataset (TODO..)
+ * @apiParam [String] [config]  List of keyword/tags (brain region, species, method of recording, etc.)
  *
  * @apiHeader {String} authorization A valid JWT token "Bearer: xxxxx"
  *
@@ -108,6 +110,7 @@ router.put('/:dataset_id', jwt({secret: config.auth.pubkey}), function(req, res,
         if(req.body.name) dataset.name = req.body.name;
         if(req.body.desc) dataset.desc = req.body.desc;
         if(req.body.config) dataset.config = req.body.config;
+        if(req.body.tags) dataset.tags = req.body.tags;
 
         dataset.save(function(err) {
             //logger.debug("dateset updated");

@@ -23,7 +23,7 @@ router.get('/health', function(req, res) {
 router.use('/project', require('./project'));
 router.use('/dataset', require('./dataset'));
 router.use('/application', require('./application'));
-router.use('/appdata', require('./appdata'));
+//router.use('/appdata', require('./appdata'));
 
 module.exports = router;
 

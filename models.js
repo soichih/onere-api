@@ -125,28 +125,7 @@ exports.Datasets = mongoose.model('Datasets',
         //any metadata associated with this dataset (data type, applications to be used for, etc..)
         config: mongoose.Schema.Types.Mixed, 
 
-        create_date: { type: Date, default: Date.now },
-    })
-);
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-exports.Applications = mongoose.model('Applications', 
-    mongoose.Schema({
-        user_id: {type: String, index: true},
-        //gids: [ Number ], //list of auth service group IDs that should have access to this data
-
-        project_id: {type: mongoose.Schema.Types.ObjectId, ref: 'Projects'},
-
-        name: String, //user friendly name for this container
-        desc: String, 
-
-        //SCA service which will execute this app 
-        //(like soichih/sca-service-docker, soichih/sca-service-git)
-        //service: String, 
-
-        //configuration for the service
-        config: mongoose.Schema.Types.Mixed, 
+        tags: [String], //brain region, spiecies, recording technique, etc..
 
         create_date: { type: Date, default: Date.now },
     })
@@ -154,6 +133,36 @@ exports.Applications = mongoose.model('Applications',
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+var application_schema = mongoose.Schema({
+    user_id: {type: String, index: true},
+    //gids: [ Number ], //list of auth service group IDs that should have access to this data
+
+    project_id: {type: mongoose.Schema.Types.ObjectId, ref: 'Projects'},
+
+    //list of input datasets and directory names
+    datasets: [{
+        name: String,
+        id: {type: mongoose.Schema.Types.ObjectId, ref: 'Datasets'},
+    }],
+
+    name: String, //user friendly name for this container
+    desc: String, 
+
+    //SCA service which will execute this app 
+    //(like soichih/sca-service-docker, soichih/sca-service-git)
+    //service: String, 
+
+    //configuration for the service
+    config: mongoose.Schema.Types.Mixed, 
+
+    create_date: { type: Date, default: Date.now },
+});
+application_schema.index({name: 'text', desc: 'text'}); //TODO need to allow searching for dataset / projects..
+exports.Applications = mongoose.model('Applications', application_schema);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
 //joins application and data together and becomes a parent of all SCA tasks
 var appdatas_schema = mongoose.Schema({
     user_id: {type: String, index: true},
@@ -172,6 +181,7 @@ var appdatas_schema = mongoose.Schema({
 });
 appdatas_schema.index({name: 'text', desc: 'text'})
 exports.Appdatas = mongoose.model('Appdatas', appdatas_schema);
+*/
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 

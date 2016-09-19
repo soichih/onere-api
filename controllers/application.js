@@ -13,7 +13,7 @@ var db = require('../models');
 /**
  * @apiGroup Service
  * @api {get} /application      Query Applications
- * @apiDescription              Query applications registered
+ * @apiDescription              Query applications registered (public API)
  *
  * @apiParam {Object} find      Optional Mongo find query - defaults to {}
  * @apiParam {Object} sort      Optional Mongo sort object - defaults to {}
@@ -21,12 +21,10 @@ var db = require('../models');
  * @apiParam {Number} limit     Optional Maximum number of records to return - defaults to 100
  * @apiParam {Number} skip      Optional Record offset for pagination
  *
- * @apiHeader {String} authorization 
- *                              A valid JWT token "Bearer: xxxxx"
- *
  * @apiSuccess {Object[]} resources        Resource detail
  */
-router.get('/', jwt({secret: config.auth.pubkey}), function(req, res, next) {
+//router.get('/', jwt({secret: config.auth.pubkey, credentialsRequired: false}), function(req, res, next) {
+router.get('/', function(req, res, next) {
     var find = {};
     if(req.query.find) find = JSON.parse(req.query.find);
     logger.debug(find);
@@ -36,6 +34,8 @@ router.get('/', jwt({secret: config.auth.pubkey}), function(req, res, next) {
     .limit(req.query.limit || 100)
     .skip(req.query.skip || 0)
     .sort(req.query.sort || '_id')
+    .populate('project_id', 'name desc')
+    .populate('datasets.id', 'name desc config') //TODO - config.files maybe too expensive for researh page.. (add param?)
     .exec(function(err, recs) {
         if(err) return next(err);
         db.Applications.count(find).exec(function(err, count) {
@@ -53,6 +53,7 @@ router.get('/', jwt({secret: config.auth.pubkey}), function(req, res, next) {
  * @apiParam {String} name      User friendly name for this app
  * @apiParam {String} desc      Description for this app
  *
+ * @apiParam {Object} datasets  Array of {name: .. id: <dataset_id>}
  * @apiParam {Object} config    Application installed and how it's configured, etc..
  *
  * @apiHeader {String} authorization A valid JWT token "Bearer: xxxxx"
@@ -83,6 +84,7 @@ router.post('/', jwt({secret: config.auth.pubkey}), function(req, res, next) {
  * @apiParam {String} [name]    User friendly name for this app
  * @apiParam {String} [desc]    Description for this app
  *
+ * @apiParam {Object} [datasets]  Array of {name: .. id: <dataset_id>}
  * @apiParam {Object} [config]  Config for this app
  *
  * @apiHeader {String} authorization A valid JWT token "Bearer: xxxxx"
@@ -100,6 +102,7 @@ router.put('/:application_id', jwt({secret: config.auth.pubkey}), function(req, 
         if(req.body.name) application.name = req.body.name;
         if(req.body.desc) application.desc = req.body.desc;
         //if(req.body.service) application.service = req.body.service;
+        if(req.body.datasets) application.datasets = req.body.datasets;
         if(req.body.config) application.config = req.body.config;
 
         application.save(function(err) {
